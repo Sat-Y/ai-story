@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>贝乐家剧桌 · 开始游玩</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#12100A;--ink-mid:#3A2E18;--ink-soft:#7A6545;
+  --cream:#FBF7EF;--warm:#F5EDD8;--warm2:#EFE3C8;
+  --amber:#C9893A;--amber-l:#E8B96A;--amber-d:#8B5E1E;
+  --teal:#1E6B5C;--teal-l:#2E9B84;--teal-pale:#D4EDE8;
+  --rose:#C0514A;--purple:#4B3D7A;--purple-l:#8B7FBA;
+  --border:rgba(60,40,10,0.12);
+  --screen-bg:#0D1520;--screen-mid:#162035;--screen-line:#1E3050;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--ink);color:var(--cream);overflow-x:hidden;min-height:100vh}
+
+/* ── SETUP SCREEN ── */
+#setup-screen{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 20px;
+  background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(201,137,58,0.12) 0%,transparent 70%),
+             radial-gradient(ellipse 50% 50% at 20% 80%,rgba(30,107,92,0.08) 0%,transparent 60%),
+             var(--ink);
+}
+.setup-back{
+  position:fixed;top:20px;left:24px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.6);font-size:13px;
+  padding:8px 18px;border-radius:100px;cursor:pointer;
+  text-decoration:none;transition:all 0.2s;font-family:'Noto Sans SC',sans-serif;
+  letter-spacing:0.04em;
+}
+.setup-back:hover{background:rgba(255,255,255,0.1);color:white}
+.setup-logo{
+  font-family:'Noto Serif SC',serif;font-size:14px;letter-spacing:0.16em;
+  color:var(--amber);margin-bottom:40px;opacity:0.8;
+}
+.setup-title{
+  font-family:'Noto Serif SC',serif;font-size:clamp(28px,5vw,48px);font-weight:700;
+  text-align:center;line-height:1.3;margin-bottom:12px;
+}
+.setup-sub{font-size:15px;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:56px;letter-spacing:0.04em}
+.setup-form{width:100%;max-width:560px;display:flex;flex-direction:column;gap:32px}
+
+.form-group label{
+  display:block;font-size:12px;letter-spacing:0.1em;color:var(--amber-l);
+  margin-bottom:12px;font-weight:500;
+}
+.genre-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.genre-btn{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.6);padding:14px 10px;border-radius:12px;
+  cursor:pointer;transition:all 0.2s;font-size:13px;font-family:'Noto Sans SC',sans-serif;
+  text-align:center;line-height:1.4;
+}
+.genre-btn .icon{font-size:22px;display:block;margin-bottom:6px}
+.genre-btn:hover{border-color:rgba(201,137,58,0.5);color:white;background:rgba(201,137,58,0.08)}
+.genre-btn.active{border-color:var(--amber);color:var(--amber-l);background:rgba(201,137,58,0.12)}
+
+.player-row{display:flex;gap:10px;align-items:center}
+.player-count-btn{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.6);font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.player-count-btn:hover{border-color:var(--amber);color:var(--amber-l)}
+.player-count-display{
+  flex:1;text-align:center;font-family:'Noto Serif SC',serif;
+  font-size:28px;font-weight:700;color:white;
+}
+.player-count-label{font-size:12px;color:rgba(255,255,255,0.35);display:block;margin-top:2px}
+
+.player-names{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.player-name-input{
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+  color:white;padding:12px 16px;border-radius:10px;
+  font-size:14px;font-family:'Noto Sans SC',sans-serif;outline:none;
+  transition:border-color 0.2s;
+}
+.player-name-input:focus{border-color:rgba(201,137,58,0.5)}
+.player-name-input::placeholder{color:rgba(255,255,255,0.25)}
+
+.start-btn{
+  background:var(--amber);color:white;border:none;
+  padding:18px;border-radius:14px;
+  font-size:17px;font-family:'Noto Serif SC',serif;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.06em;
+  margin-top:8px;
+}
+.start-btn:hover{background:var(--amber-l);transform:translateY(-2px);box-shadow:0 12px 32px rgba(201,137,58,0.3)}
+.start-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ── LOADING SCREEN ── */
+#loading-screen{
+  display:none;min-height:100vh;
+  flex-direction:column;align-items:center;justify-content:center;
+  background:var(--screen-bg);padding:40px;
+}
+.loading-robot{font-size:64px;animation:robot-bob 1.2s ease-in-out infinite;margin-bottom:32px}
+@keyframes robot-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.loading-text{
+  font-family:'Noto Serif SC',serif;font-size:20px;color:white;
+  margin-bottom:12px;text-align:center;
+}
+.loading-sub{font-size:13px;color:rgba(255,255,255,0.35);text-align:center;letter-spacing:0.06em}
+.loading-bar{
+  width:200px;height:3px;background:rgba(255,255,255,0.08);
+  border-radius:100px;margin-top:32px;overflow:hidden;
+}
+.loading-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--teal-l),var(--amber));
+  border-radius:100px;animation:load-fill 2.5s ease-in-out forwards;
+}
+@keyframes load-fill{0%{width:0%}60%{width:70%}100%{width:100%}}
+
+/* ── GAME SCREEN ── */
+#game-screen{
+  display:none;min-height:100vh;
+  flex-direction:column;
+  background:var(--screen-bg);
+}
+
+/* Header */
+.game-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 24px;
+  background:rgba(255,255,255,0.03);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;
+}
+.game-header-left{display:flex;align-items:center;gap:12px}
+.game-logo-sm{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--amber-l);letter-spacing:0.1em}
+.chapter-badge{
+  background:rgba(201,137,58,0.15);border:1px solid rgba(201,137,58,0.25);
+  color:var(--amber-l);font-size:11px;padding:4px 12px;border-radius:100px;
+  letter-spacing:0.08em;
+}
+.game-header-right{display:flex;align-items:center;gap:8px}
+.player-pill{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:100px;padding:5px 12px;
+  font-size:12px;color:rgba(255,255,255,0.6);
+}
+.quit-btn{
+  background:transparent;border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.35);font-size:12px;
+  padding:6px 14px;border-radius:100px;cursor:pointer;
+  font-family:'Noto Sans SC',sans-serif;transition:all 0.2s;
+}
+.quit-btn:hover{border-color:var(--rose);color:var(--rose)}
+
+/* Main layout */
+.game-body{
+  flex:1;display:grid;
+  grid-template-columns:280px 1fr 260px;
+  gap:0;overflow:hidden;
+  height:calc(100vh - 57px);
+}
+
+/* Left: Players panel */
+.players-panel{
+  border-right:1px solid rgba(255,255,255,0.06);
+  padding:20px 16px;overflow-y:auto;
+  background:rgba(255,255,255,0.02);
+}
+.panel-title{
+  font-size:10px;letter-spacing:0.12em;color:rgba(255,255,255,0.3);
+  margin-bottom:16px;font-weight:500;
+}
+.player-card{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:14px;margin-bottom:10px;
+  transition:border-color 0.2s;
+}
+.player-card.active-turn{border-color:rgba(201,137,58,0.4);background:rgba(201,137,58,0.06)}
+.pc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pc-avatar{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.pc-name{font-size:14px;font-weight:500;color:white}
+.pc-role{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px}
+.pc-status{
+  font-size:11px;padding:4px 10px;border-radius:100px;
+  display:inline-block;
+}
+.status-wait{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.35)}
+.status-turn{background:rgba(201,137,58,0.2);color:var(--amber-l)}
+.status-done{background:rgba(30,107,92,0.2);color:var(--teal-l)}
+
+.dm-card{
+  margin-top:20px;
+  background:linear-gradient(135deg,rgba(30,107,92,0.15),rgba(75,61,122,0.1));
+  border:1px solid rgba(46,155,132,0.25);
+  border-radius:12px;padding:14px;
+}
+.dm-avatar{font-size:28px;text-align:center;margin-bottom:8px}
+.dm-name{font-size:13px;font-weight:500;color:var(--teal-l);text-align:center;margin-bottom:4px}
+.dm-status-dot{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:11px;color:rgba(255,255,255,0.4);
+}
+.dot-pulse{
+  width:6px;height:6px;border-radius:50%;background:var(--teal-l);
+  animation:dot-pulse 2s ease-in-out infinite;
+}
+@keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Center: Story panel */
+.story-panel{
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.story-scroll{
+  flex:1;overflow-y:auto;padding:28px 32px;
+  scroll-behavior:smooth;
+}
+.story-scroll::-webkit-scrollbar{width:4px}
+.story-scroll::-webkit-scrollbar-track{background:transparent}
+.story-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+
+/* Messages */
+.msg{margin-bottom:24px;animation:msg-in 0.4s ease}
+@keyframes msg-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.msg-dm .msg-header{
+  display:flex;align-items:center;gap:8px;margin-bottom:8px;
+}
+.msg-dm .msg-icon{font-size:18px}
+.msg-dm .msg-sender{font-size:12px;color:var(--teal-l);font-weight:500;letter-spacing:0.04em}
+.msg-dm .msg-body{
+  background:rgba(30,107,92,0.12);border:1px solid rgba(30,107,92,0.2);
+  border-radius:4px 16px 16px 16px;
+  padding:16px 20px;
+  font-size:14px;line-height:1.85;color:rgba(255,255,255,0.85);
+  font-family:'Noto Serif SC',serif;
+  position:relative;
+}
+.msg-dm .msg-body.narrator{
+  background:rgba(75,61,122,0.12);border-color:rgba(75,61,122,0.25);
+  font-style:italic;
+}
+
+.msg-player .msg-header{
+  display:flex;align-items:center;gap:8px;margin-bottom:8px;
+  justify-content:flex-end;
+}
+.msg-player .msg-sender{font-size:12px;color:var(--amber-l);font-weight:500}
+.msg-player .msg-body{
+  background:rgba(201,137,58,0.12);border:1px solid rgba(201,137,58,0.2);
+  border-radius:16px 4px 16px 16px;
+  padding:14px 18px;font-size:14px;line-height:1.75;
+  color:rgba(255,255,255,0.8);
+  max-width:80%;margin-left:auto;
+}
+
+.msg-system{
+  text-align:center;margin:16px 0;
+}
+.msg-system span{
+  background:rgba(255,255,255,0.05);
+  font-size:11px;color:rgba(255,255,255,0.3);
+  padding:5px 16px;border-radius:100px;letter-spacing:0.06em;
+}
+
+/* Typing indicator */
+.typing-indicator{
+  display:none;align-items:center;gap:6px;
+  padding:0 0 16px;
+}
+.typing-indicator.show{display:flex}
+.typing-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--teal-l);opacity:0.6;
+  animation:typing 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2){animation-delay:0.2s}
+.typing-dot:nth-child(3){animation-delay:0.4s}
+@keyframes typing{0%,80%,100%{transform:scale(1);opacity:0.4}40%{transform:scale(1.2);opacity:1}}
+
+/* Choices */
+.choices-area{
+  padding:16px 32px 20px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;
+}
+.choices-label{font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.08em;margin-bottom:12px}
+.choices-grid{display:flex;flex-direction:column;gap:8px}
+.choice-btn{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.75);text-align:left;
+  padding:12px 18px;border-radius:10px;cursor:pointer;
+  font-size:13px;font-family:'Noto Sans SC',sans-serif;
+  transition:all 0.2s;line-height:1.5;
+}
+.choice-btn:hover{border-color:rgba(201,137,58,0.5);color:white;background:rgba(201,137,58,0.08);transform:translateX(4px)}
+.choice-btn:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+
+.free-input-row{
+  display:flex;gap:8px;margin-top:12px;
+}
+.free-input{
+  flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+  color:white;padding:11px 16px;border-radius:10px;
+  font-size:13px;font-family:'Noto Sans SC',sans-serif;outline:none;
+  transition:border-color 0.2s;
+}
+.free-input:focus{border-color:rgba(201,137,58,0.4)}
+.free-input::placeholder{color:rgba(255,255,255,0.2)}
+.send-btn{
+  background:var(--amber);color:white;border:none;
+  width:44px;height:44px;border-radius:10px;
+  font-size:18px;cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.send-btn:hover{background:var(--amber-l)}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+/* Right: Info panel */
+.info-panel{
+  border-left:1px solid rgba(255,255,255,0.06);
+  padding:20px 16px;overflow-y:auto;
+  background:rgba(255,255,255,0.01);
+}
+.clue-card{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:14px;margin-bottom:12px;
+}
+.clue-card.locked{opacity:0.35;filter:blur(2px);pointer-events:none;user-select:none}
+.clue-label{
+  font-size:10px;letter-spacing:0.1em;color:var(--amber-l);
+  margin-bottom:8px;font-weight:500;
+}
+.clue-text{font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7}
+
+.atmosphere-bar{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:14px;margin-bottom:12px;
+}
+.atm-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.atm-label{font-size:11px;color:rgba(255,255,255,0.4);flex:1}
+.atm-val{
+  font-size:11px;color:var(--amber-l);font-weight:500;min-width:28px;text-align:right;
+}
+.atm-track{
+  height:3px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;
+  margin-bottom:10px;
+}
+.atm-fill{height:100%;border-radius:100px;transition:width 1s ease}
+.atm-tension{background:linear-gradient(90deg,var(--amber),var(--rose))}
+.atm-mystery{background:linear-gradient(90deg,var(--purple-l),var(--teal-l))}
+
+.light-indicator{
+  margin-top:16px;padding:12px;
+  background:rgba(255,255,255,0.03);border-radius:10px;
+  text-align:center;
+}
+.light-orb{
+  width:48px;height:48px;border-radius:50%;margin:0 auto 8px;
+  transition:background 2s ease,box-shadow 2s ease;
+}
+.light-label{font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.06em}
+
+/* END SCREEN */
+#end-screen{
+  display:none;min-height:100vh;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 20px;
+  background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(201,137,58,0.1) 0%,transparent 70%),var(--screen-bg);
+}
+.end-icon{font-size:72px;margin-bottom:24px}
+.end-title{
+  font-family:'Noto Serif SC',serif;font-size:clamp(24px,4vw,40px);font-weight:700;
+  color:white;text-align:center;margin-bottom:12px;
+}
+.end-sub{font-size:15px;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:40px}
+.end-memory{
+  max-width:560px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;padding:32px;text-align:center;margin-bottom:40px;
+}
+.end-memory-title{
+  font-size:12px;letter-spacing:0.1em;color:var(--amber-l);margin-bottom:16px;
+}
+.end-memory-text{
+  font-family:'Noto Serif SC',serif;font-size:15px;
+  color:rgba(255,255,255,0.7);line-height:1.9;
+}
+.end-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.end-btn-main{
+  background:var(--amber);color:white;border:none;
+  padding:14px 36px;border-radius:100px;font-size:15px;
+  font-family:'Noto Serif SC',serif;font-weight:700;cursor:pointer;
+  transition:all 0.2s;letter-spacing:0.06em;
+}
+.end-btn-main:hover{background:var(--amber-l);transform:translateY(-2px)}
+.end-btn-sec{
+  background:transparent;border:1px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.55);padding:14px 32px;border-radius:100px;
+  font-size:15px;font-family:'Noto Sans SC',sans-serif;cursor:pointer;transition:all 0.2s;
+}
+.end-btn-sec:hover{border-color:rgba(255,255,255,0.35);color:white}
+
+/* Light themes */
+.light-calm{background:rgba(30,107,92,0.6);box-shadow:0 0 24px rgba(30,107,92,0.4)}
+.light-tense{background:rgba(192,81,74,0.7);box-shadow:0 0 24px rgba(192,81,74,0.5)}
+.light-mystery{background:rgba(75,61,122,0.7);box-shadow:0 0 24px rgba(75,61,122,0.5)}
+.light-warm{background:rgba(201,137,58,0.7);box-shadow:0 0 24px rgba(201,137,58,0.5)}
+.light-end{background:rgba(232,185,106,0.8);box-shadow:0 0 32px rgba(232,185,106,0.6)}
+
+@media(max-width:900px){
+  .game-body{grid-template-columns:1fr}
+  .players-panel,.info-panel{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ SETUP SCREEN ══ -->
+<div id="setup-screen">
+  <a href="beile_website.html" class="setup-back">← 返回主页</a>
+
+  <div class="setup-logo">🤖 BeiLe · 贝乐家剧桌</div>
+  <h1 class="setup-title">开启你们的<br>专属家庭冒险</h1>
+  <p class="setup-sub">AI 即时生成剧本 · 智能 DM 全程主持 · 沉浸式互动体验</p>
+
+  <div class="setup-form">
+    <!-- Genre -->
+    <div class="form-group">
+      <label>选择剧本类型</label>
+      <div class="genre-grid" id="genre-grid">
+        <button class="genre-btn active" data-genre="悬疑推理" onclick="selectGenre(this)">
+          <span class="icon">🔍</span>悬疑推理
+        </button>
+        <button class="genre-btn" data-genre="奇幻冒险" onclick="selectGenre(this)">
+          <span class="icon">⚔️</span>奇幻冒险
+        </button>
+        <button class="genre-btn" data-genre="温情家庭" onclick="selectGenre(this)">
+          <span class="icon">🏠</span>温情家庭
+        </button>
+        <button class="genre-btn" data-genre="古风武侠" onclick="selectGenre(this)">
+          <span class="icon">🏯</span>古风武侠
+        </button>
+        <button class="genre-btn" data-genre="科幻未来" onclick="selectGenre(this)">
+          <span class="icon">🚀</span>科幻未来
+        </button>
+        <button class="genre-btn" data-genre="搞笑喜剧" onclick="selectGenre(this)">
+          <span class="icon">😂</span>搞笑喜剧
+        </button>
+      </div>
+    </div>
+
+    <!-- Players -->
+    <div class="form-group">
+      <label>参与人数</label>
+      <div class="player-row">
+        <button class="player-count-btn" onclick="changeCount(-1)">−</button>
+        <div class="player-count-display">
+          <span id="count-num">2</span>
+          <span class="player-count-label">名玩家</span>
+        </div>
+        <button class="player-count-btn" onclick="changeCount(1)">+</button>
+      </div>
+      <div class="player-names" id="player-names"></div>
+    </div>
+
+    <button class="start-btn" id="start-btn" onclick="startGame()">
+      🎭 开始游玩
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ LOADING SCREEN ══ -->
+<div id="loading-screen">
+  <div class="loading-robot">🤖</div>
+  <div class="loading-text" id="loading-text">贝乐正在为你们创作专属剧本…</div>
+  <div class="loading-sub" id="loading-sub">AI 正在构建角色与剧情线索</div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+
+<!-- ══════════════════════════════════════ GAME SCREEN ══ -->
+<div id="game-screen">
+  <!-- Header -->
+  <div class="game-header">
+    <div class="game-header-left">
+      <div class="game-logo-sm">贝乐家剧桌</div>
+      <div class="chapter-badge" id="chapter-badge">序章</div>
+    </div>
+    <div class="game-header-right">
+      <div class="player-pill" id="header-players"></div>
+      <button class="quit-btn" onclick="confirmQuit()">退出</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="game-body">
+    <!-- LEFT -->
+    <div class="players-panel">
+      <div class="panel-title">PLAYERS</div>
+      <div id="player-cards"></div>
+      <div class="dm-card">
+        <div class="dm-avatar">🤖</div>
+        <div class="dm-name">贝乐 DM</div>
+        <div class="dm-status-dot">
+          <div class="dot-pulse"></div>
+          <span id="dm-status-text">待机中</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="story-panel">
+      <div class="story-scroll" id="story-scroll">
+        <div id="messages"></div>
+        <div class="typing-indicator" id="typing">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+      <div class="choices-area" id="choices-area">
+        <div class="choices-label">ACTIONS</div>
+        <div class="choices-grid" id="choices-grid"></div>
+        <div class="free-input-row">
+          <input type="text" class="free-input" id="free-input" placeholder="或者输入你自己的行动…" maxlength="80"
+            onkeydown="if(event.key==='Enter')sendFree()">
+          <button class="send-btn" id="send-btn" onclick="sendFree()">→</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="info-panel">
+      <div class="panel-title">CLUES</div>
+      <div class="atmosphere-bar">
+        <div class="atm-row">
+          <span class="atm-label">紧张度</span>
+          <span class="atm-val" id="tension-val">20%</span>
+        </div>
+        <div class="atm-track"><div class="atm-fill atm-tension" id="tension-bar" style="width:20%"></div></div>
+        <div class="atm-row">
+          <span class="atm-label">神秘感</span>
+          <span class="atm-val" id="mystery-val">60%</span>
+        </div>
+        <div class="atm-track"><div class="atm-fill atm-mystery" id="mystery-bar" style="width:60%"></div></div>
+      </div>
+
+      <div class="light-indicator">
+        <div class="light-orb light-mystery" id="light-orb"></div>
+        <div class="light-label" id="light-label">神秘氛围</div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="panel-title">DISCOVERED</div>
+        <div id="clues-list">
+          <div class="clue-card locked">
+            <div class="clue-label">线索 #1</div>
+            <div class="clue-text">尚未发现</div>
+          </div>
+          <div class="clue-card locked">
+            <div class="clue-label">线索 #2</div>
+            <div class="clue-text">尚未发现</div>
+          </div>
+          <div class="clue-card locked">
+            <div class="clue-label">线索 #3</div>
+            <div class="clue-text">尚未发现</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ END SCREEN ══ -->
+<div id="end-screen">
+  <div class="end-icon" id="end-icon">🎭</div>
+  <h2 class="end-title" id="end-title">故事落幕</h2>
+  <p class="end-sub" id="end-sub">一段难忘的家庭冒险</p>
+  <div class="end-memory">
+    <div class="end-memory-title">📸 家庭记忆 · AI 留存</div>
+    <div class="end-memory-text" id="end-memory-text">正在生成回忆…</div>
+  </div>
+  <div class="end-actions">
+    <button class="end-btn-main" onclick="restartGame()">🎭 再来一局</button>
+    <button class="end-btn-sec" onclick="location.href='beile_website.html'">返回主页</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════ STATE ═══════
+const state = {
+  genre: '悬疑推理',
+  playerCount: 2,
+  playerNames: ['玩家一', '玩家二'],
+  roles: [],
+  title: '',
+  chapter: 0,
+  maxChapters: 4,
+  turnIndex: 0,
+  clues: [],
+  tension: 20,
+  mystery: 60,
+  history: [],
+  isLoading: false,
+  storyContext: '',
+};
+
+// ═══════════════════════════════════ SETUP ═══════
+function selectGenre(btn) {
+  document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.genre = btn.dataset.genre;
+}
+
+function changeCount(delta) {
+  state.playerCount = Math.max(2, Math.min(5, state.playerCount + delta));
+  document.getElementById('count-num').textContent = state.playerCount;
+  renderNameInputs();
+}
+
+function renderNameInputs() {
+  const container = document.getElementById('player-names');
+  const avatars = ['🦊','🐯','🐧','🐸','🦁'];
+  container.innerHTML = '';
+  for (let i = 0; i < state.playerCount; i++) {
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'player-name-input';
+    inp.placeholder = `${avatars[i]} 玩家 ${i+1} 的名字`;
+    inp.value = state.playerNames[i] || '';
+    inp.oninput = e => { state.playerNames[i] = e.target.value || `玩家${i+1}`; };
+    container.appendChild(inp);
+  }
+}
+
+renderNameInputs();
+
+// ═══════════════════════════════════ DEEPSEEK API ═══════
+const DS_KEY = 'sk-24decc2a23be46438fe175aef0e8d275';
+
+async function callClaude(systemPrompt, userMsg, maxTokens = 800) {
+  const messages = [{ role: 'system', content: systemPrompt }];
+  if (state.history.length > 0) {
+    state.history.slice(-8).forEach(h => messages.push(h));
+  }
+  messages.push({ role: 'user', content: userMsg });
+
+  const resp = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${DS_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      max_tokens: maxTokens,
+      temperature: 0.9,
+      messages,
+    })
+  });
+  const data = await resp.json();
+  const text = data.choices?.[0]?.message?.content || '';
+  state.history.push({ role: 'user', content: userMsg });
+  state.history.push({ role: 'assistant', content: text });
+  return text;
+}
+
+function buildSystemPrompt() {
+  const names = state.playerNames.slice(0, state.playerCount).join('、');
+  return `你是"贝乐"——一个充满魅力的家庭互动剧本游戏主持人（DM）。你正在主持一场${state.genre}风格的沉浸式家庭剧本游戏。
+
+参与玩家：${names}（共${state.playerCount}人）
+剧本名称：${state.title || '待定'}
+当前章节：第${state.chapter}章，共${state.maxChapters}章
+
+你的职责：
+1. 用生动、有画面感的语言推进故事，每次回复控制在150字以内
+2. 始终推动情节发展，不重复信息
+3. 每次回复后提供3个简短的行动选项（每个不超过15字），用JSON格式包裹：{"choices":["选项1","选项2","选项3"],"tension":数字0-100,"mystery":数字0-100,"light":"calm|tense|mystery|warm","clue":"发现的线索（可为空字符串）","chapter_title":"当前章节标题","is_final":false}
+4. 当故事到达高潮结局时，设置 is_final:true，并写出感人的收尾
+5. 语言生动有趣，适合全家参与
+6. 对玩家的自由输入要积极回应并融入剧情
+
+注意：只输出叙述文字 + JSON数据块，格式：
+[叙述内容]
+\`\`\`json
+{...}
+\`\`\``;
+}
+
+function parseResponse(text) {
+  const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
+  let data = {};
+  let narrative = text;
+  if (jsonMatch) {
+    try { data = JSON.parse(jsonMatch[1]); } catch(e) {}
+    narrative = text.replace(/```json[\s\S]*?```/, '').trim();
+  }
+  return { narrative, data };
+}
+
+// ═══════════════════════════════════ GAME START ═══════
+async function startGame() {
+  const btn = document.getElementById('start-btn');
+  btn.disabled = true;
+  btn.textContent = '正在准备…';
+
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'flex';
+
+  const loadingTexts = [
+    ['贝乐正在为你们创作专属剧本…', 'AI 正在构建角色与剧情线索'],
+    ['剧情骨架已搭建完成…', '正在为每位玩家分配专属角色'],
+    ['角色性格与动机已就绪…', '正在设置关键线索与谜题'],
+    ['氛围音效与灯光方案准备中…', '即将开幕！'],
+  ];
+  let li = 0;
+  const ltimer = setInterval(() => {
+    if (li < loadingTexts.length) {
+      document.getElementById('loading-text').textContent = loadingTexts[li][0];
+      document.getElementById('loading-sub').textContent = loadingTexts[li][1];
+      li++;
+    }
+  }, 700);
+
+  try {
+    const names = state.playerNames.slice(0, state.playerCount).join('、');
+    const prompt = `请为以下家庭游戏生成开场设定，用JSON格式返回：
+玩家：${names}（${state.playerCount}人）
+类型：${state.genre}
+
+返回格式（仅JSON，无其他文字）：
+{
+  "title": "剧本名称（4-8字，有创意）",
+  "tagline": "一句话简介（不超过20字）",
+  "roles": [{"name":"角色名","player":"玩家名","trait":"一句话性格特点"}],
+  "opening": "开场旁白（100-150字，有画面感，引人入胜）",
+  "choices": ["初始选项1（不超过15字）","初始选项2","初始选项3"],
+  "tension": 15,
+  "mystery": 70,
+  "light": "mystery"
+}`;
+
+    const raw = await callClaude(
+      `你是贝乐家剧桌的剧本创作AI。请严格按照JSON格式输出，不要有任何额外说明。`,
+      prompt,
+      600
+    );
+
+    let setupData;
+    try {
+      const clean = raw.replace(/```json|```/g, '').trim();
+      setupData = JSON.parse(clean);
+    } catch(e) {
+      // fallback
+      setupData = generateFallback();
+    }
+
+    clearInterval(ltimer);
+    state.history = []; // reset after setup call
+    state.title = setupData.title || '神秘的邀请';
+    state.roles = setupData.roles || [];
+    state.chapter = 1;
+
+    initGameScreen(setupData);
+
+  } catch(err) {
+    clearInterval(ltimer);
+    initGameScreen(generateFallback());
+  }
+}
+
+function generateFallback() {
+  const names = state.playerNames.slice(0, state.playerCount);
+  const roleNames = ['侦探','记者','医生','学者','艺术家'];
+  return {
+    title: state.genre === '悬疑推理' ? '午夜密室' : state.genre === '奇幻冒险' ? '失落的宝藏' : '家庭的秘密',
+    tagline: '一场出乎意料的冒险正在开始',
+    roles: names.map((n,i) => ({name:roleNames[i],player:n,trait:'聪明机智，善于观察'})),
+    opening: `夜已深，一封神秘的邀请函出现在了你们面前。信纸上只有寥寥几字："来这里，你们会找到答案。"窗外，月光照在古老的庄园上，风吹过树梢，发出沙沙的声响。你们面面相觑——冒险，就这样开始了。`,
+    choices: ['推开古宅的大门','查看邀请函的细节','和同伴商量对策'],
+    tension: 15,
+    mystery: 70,
+    light: 'mystery'
+  };
+}
+
+function initGameScreen(setup) {
+  document.getElementById('loading-screen').style.display = 'none';
+  const gs = document.getElementById('game-screen');
+  gs.style.display = 'flex';
+  gs.style.flexDirection = 'column';
+
+  // Header
+  document.getElementById('chapter-badge').textContent = `第一章`;
+  document.getElementById('header-players').textContent = `${state.playerCount} 位玩家`;
+
+  // Player cards
+  const avatars = ['🦊','🐯','🐧','🐸','🦁'];
+  const avColors = ['rgba(201,137,58,0.2)','rgba(30,107,92,0.2)','rgba(75,61,122,0.2)','rgba(192,81,74,0.2)','rgba(46,155,132,0.2)'];
+  const avText = ['var(--amber-l)','var(--teal-l)','var(--purple-l)','#E88080','var(--teal-l)'];
+
+  const pc = document.getElementById('player-cards');
+  pc.innerHTML = '';
+  state.roles.forEach((r, i) => {
+    const name = r.player || state.playerNames[i] || `玩家${i+1}`;
+    const div = document.createElement('div');
+    div.className = 'player-card' + (i === 0 ? ' active-turn' : '');
+    div.id = `pcard-${i}`;
+    div.innerHTML = `
+      <div class="pc-top">
+        <div class="pc-avatar" style="background:${avColors[i]};color:${avText[i]}">${avatars[i]}</div>
+        <div><div class="pc-name">${name}</div><div class="pc-role">${r.name || '未知角色'}</div></div>
+      </div>
+      <span class="pc-status ${i===0?'status-turn':'status-wait'}">${i===0?'行动中':'等待中'}</span>`;
+    pc.appendChild(div);
+  });
+
+  // System message
+  addSystemMsg(`🎭 剧本《${setup.title}》已就绪`);
+  addDMMsg(setup.tagline || '', 'narrator');
+
+  // Roles announcement
+  const rolesText = state.roles.map(r => `【${r.player || '?'}】饰演 ${r.name}，${r.trait}`).join('；');
+  addDMMsg(`角色分配完成：${rolesText}`, 'narrator');
+
+  setTimeout(() => {
+    addDMMsg(setup.opening, 'dm');
+    updateAtmosphere(setup.tension || 15, setup.mystery || 70);
+    setLight(setup.light || 'mystery');
+    setChoices(setup.choices || []);
+  }, 600);
+}
+
+// ═══════════════════════════════════ GAME LOOP ═══════
+async function makeChoice(choice) {
+  if (state.isLoading) return;
+  setLoading(true);
+
+  const currentPlayer = state.playerNames[state.turnIndex % state.playerCount];
+  addPlayerMsg(currentPlayer, choice);
+  clearChoices();
+
+  try {
+    const raw = await callClaude(buildSystemPrompt(), `${currentPlayer}选择了：${choice}`);
+    const { narrative, data } = parseResponse(raw);
+
+    addDMMsg(narrative, 'dm');
+    updateAtmosphere(data.tension ?? state.tension, data.mystery ?? state.mystery);
+    if (data.light) setLight(data.light);
+    if (data.clue) addClue(data.clue);
+    if (data.chapter_title) updateChapter(data.chapter_title);
+
+    state.turnIndex++;
+    updatePlayerTurns();
+
+    if (data.is_final) {
+      setTimeout(() => endGame(narrative), 1200);
+    } else {
+      setChoices(data.choices || []);
+    }
+  } catch(err) {
+    addDMMsg('（通信中断，请稍后重试）', 'narrator');
+    setChoices(['继续探索','稍作休息','观察周围']);
+  }
+
+  setLoading(false);
+}
+
+async function sendFree() {
+  const inp = document.getElementById('free-input');
+  const val = inp.value.trim();
+  if (!val || state.isLoading) return;
+  inp.value = '';
+  await makeChoice(val);
+}
+
+// ═══════════════════════════════════ UI HELPERS ═══════
+function addDMMsg(text, type='dm') {
+  if (!text) return;
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-dm';
+  div.innerHTML = `
+    <div class="msg-header">
+      <span class="msg-icon">${type==='narrator'?'📖':'🤖'}</span>
+      <span class="msg-sender">${type==='narrator'?'旁白':'贝乐 DM'}</span>
+    </div>
+    <div class="msg-body ${type==='narrator'?'narrator':''}">${text}</div>`;
+  msgs.appendChild(div);
+  scrollBottom();
+}
+
+function addPlayerMsg(name, text) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-player';
+  div.innerHTML = `
+    <div class="msg-header">
+      <span class="msg-sender">${name}</span>
+    </div>
+    <div class="msg-body">${text}</div>`;
+  msgs.appendChild(div);
+  scrollBottom();
+}
+
+function addSystemMsg(text) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-system';
+  div.innerHTML = `<span>${text}</span>`;
+  msgs.appendChild(div);
+  scrollBottom();
+}
+
+function setChoices(choices) {
+  const grid = document.getElementById('choices-grid');
+  grid.innerHTML = '';
+  (choices || []).forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c;
+    btn.onclick = () => makeChoice(c);
+    grid.appendChild(btn);
+  });
+}
+
+function clearChoices() {
+  document.getElementById('choices-grid').innerHTML = '';
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+}
+
+function setLoading(v) {
+  state.isLoading = v;
+  document.getElementById('typing').className = 'typing-indicator' + (v?' show':'');
+  document.getElementById('dm-status-text').textContent = v ? '思考中…' : '待机中';
+  document.getElementById('send-btn').disabled = v;
+  document.getElementById('free-input').disabled = v;
+  if (v) scrollBottom();
+}
+
+function scrollBottom() {
+  const s = document.getElementById('story-scroll');
+  setTimeout(() => s.scrollTop = s.scrollHeight, 100);
+}
+
+function updateAtmosphere(tension, mystery) {
+  state.tension = tension;
+  state.mystery = mystery;
+  document.getElementById('tension-bar').style.width = tension + '%';
+  document.getElementById('tension-val').textContent = tension + '%';
+  document.getElementById('mystery-bar').style.width = mystery + '%';
+  document.getElementById('mystery-val').textContent = mystery + '%';
+}
+
+function setLight(mode) {
+  const orb = document.getElementById('light-orb');
+  const labels = {calm:'平静祥和',tense:'剑拔弩张',mystery:'神秘莫测',warm:'温情时刻',end:'故事落幕'};
+  orb.className = 'light-orb light-' + mode;
+  document.getElementById('light-label').textContent = labels[mode] || '氛围变化';
+}
+
+let clueCount = 0;
+function addClue(text) {
+  if (!text || clueCount >= 3) return;
+  const list = document.getElementById('clues-list');
+  const cards = list.querySelectorAll('.clue-card');
+  if (cards[clueCount]) {
+    cards[clueCount].classList.remove('locked');
+    cards[clueCount].querySelector('.clue-text').textContent = text;
+    clueCount++;
+  }
+}
+
+function updateChapter(title) {
+  state.chapter = Math.min(state.chapter + 1, state.maxChapters);
+  const badge = document.getElementById('chapter-badge');
+  badge.textContent = title || `第${state.chapter}章`;
+  badge.style.animation = 'none';
+  setTimeout(() => badge.style.animation = '', 10);
+  addSystemMsg(`📖 ${title || `第${state.chapter}章`}`);
+}
+
+function updatePlayerTurns() {
+  for (let i = 0; i < state.playerCount; i++) {
+    const card = document.getElementById(`pcard-${i}`);
+    if (!card) continue;
+    const isActive = (state.turnIndex % state.playerCount) === i;
+    card.className = 'player-card' + (isActive ? ' active-turn' : '');
+    const status = card.querySelector('.pc-status');
+    status.className = 'pc-status ' + (isActive ? 'status-turn' : 'status-wait');
+    status.textContent = isActive ? '行动中' : '等待中';
+  }
+}
+
+// ═══════════════════════════════════ END GAME ═══════
+async function endGame(finalNarrative) {
+  setChoices([]);
+  document.getElementById('free-input').disabled = true;
+  setLight('end');
+  addSystemMsg('✨ 故事落幕');
+
+  const names = state.playerNames.slice(0, state.playerCount).join('、');
+  let memory = '';
+  try {
+    memory = await callClaude(
+      '你是一个温情的家庭记忆AI，用诗意的语言为家庭记录今天的游戏回忆。',
+      `请用2-3句温情的话，为${names}记录这场《${state.title}》的家庭游戏回忆。要有具体感，提到游戏类型${state.genre}，语言温暖感人。`,
+      200
+    );
+  } catch(e) {
+    memory = `今天，${names}共同演绎了一段${state.genre}的家庭故事。每一个选择、每一次欢笑，都已悄悄变成了专属于你们的温暖记忆。`;
+  }
+
+  setTimeout(() => {
+    document.getElementById('game-screen').style.display = 'none';
+    const es = document.getElementById('end-screen');
+    es.style.display = 'flex';
+    es.style.flexDirection = 'column';
+
+    const icons = {'悬疑推理':'🔍','奇幻冒险':'⚔️','温情家庭':'🏠','古风武侠':'🏯','科幻未来':'🚀','搞笑喜剧':'😂'};
+    document.getElementById('end-icon').textContent = icons[state.genre] || '🎭';
+    document.getElementById('end-title').textContent = `《${state.title}》落幕`;
+    document.getElementById('end-sub').textContent = `${names}，感谢你们的精彩演绎`;
+    document.getElementById('end-memory-text').textContent = memory;
+  }, 1500);
+}
+
+function restartGame() {
+  state.history = [];
+  state.chapter = 0;
+  state.turnIndex = 0;
+  state.clues = [];
+  clueCount = 0;
+  state.tension = 20;
+  state.mystery = 60;
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('end-screen').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'flex';
+  document.getElementById('start-btn').disabled = false;
+  document.getElementById('start-btn').textContent = '🎭 开始游玩';
+}
+
+function confirmQuit() {
+  if (confirm('确定要退出当前游戏吗？进度将不会保存。')) {
+    restartGame();
+  }
+}
+</script>
+</body>
+</html>

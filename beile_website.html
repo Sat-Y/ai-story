@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>贝乐家剧桌 — AI驱动的家庭互动剧本机器人</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --warm: #F5EDD8;
+    --cream: #FBF7EF;
+    --amber: #C9893A;
+    --amber-light: #E8B96A;
+    --amber-dark: #8B5E1E;
+    --ink: #1A1208;
+    --ink-mid: #3D2E14;
+    --ink-soft: #7A6545;
+    --teal: #1E6B5C;
+    --teal-light: #2E9B84;
+    --teal-pale: #D4EDE8;
+    --rose: #C0514A;
+    --purple: #4B3D7A;
+    --purple-pale: #EAE7F5;
+    --border: rgba(60,40,10,0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5vw;
+    height: 64px;
+    background: rgba(251,247,239,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .nav-logo span { color: var(--amber); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-size: 14px; color: var(--ink-soft);
+    text-decoration: none; letter-spacing: 0.04em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--amber-dark); }
+  .nav-cta {
+    background: var(--amber);
+    color: white; border: none;
+    padding: 10px 24px; border-radius: 100px;
+    font-size: 14px; font-family: 'Noto Sans SC', sans-serif;
+    cursor: pointer; transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.04em;
+  }
+  .nav-cta:hover { background: var(--amber-dark); transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 100px 5vw 60px;
+    gap: 60px;
+    background: radial-gradient(ellipse 80% 70% at 70% 50%, rgba(201,137,58,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 60% at 20% 80%, rgba(30,107,92,0.06) 0%, transparent 60%),
+                var(--cream);
+  }
+  .hero-text { max-width: 560px; }
+  .hero-badge {
+    display: inline-block;
+    background: var(--teal-pale);
+    color: var(--teal);
+    font-size: 12px; letter-spacing: 0.1em;
+    padding: 6px 16px; border-radius: 100px;
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+  .hero-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .hero-title .accent { color: var(--amber); }
+  .hero-subtitle {
+    font-size: 18px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+  .hero-tagline {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.9;
+    margin-bottom: 48px;
+    border-left: 3px solid var(--amber-light);
+    padding-left: 18px;
+  }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    background: var(--amber);
+    color: white; border: none;
+    padding: 16px 36px; border-radius: 100px;
+    font-size: 16px; font-family: 'Noto Sans SC', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    letter-spacing: 0.04em; font-weight: 500;
+  }
+  .btn-primary:hover { background: var(--amber-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(140,80,20,0.25); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink-soft); 
+    border: 1.5px solid var(--border);
+    padding: 16px 32px; border-radius: 100px;
+    font-size: 16px; font-family: 'Noto Sans SC', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    letter-spacing: 0.04em;
+  }
+  .btn-secondary:hover { border-color: var(--amber); color: var(--amber-dark); }
+
+  /* Hero visual */
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .product-stage {
+    position: relative;
+    width: 420px;
+    height: 480px;
+  }
+  .product-glow {
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,137,58,0.2) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 0.7; }
+    50% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+  }
+  .product-table {
+    position: absolute;
+    bottom: 40px; left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
+  }
+  /* SVG table illustration */
+  .float-card {
+    position: absolute;
+    background: white;
+    border-radius: 16px;
+    padding: 14px 18px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-mid);
+    animation: float 5s ease-in-out infinite;
+  }
+  .float-card .card-icon {
+    font-size: 20px; margin-bottom: 4px;
+    display: block;
+  }
+  .float-card .card-label { font-size: 11px; color: var(--ink-soft); letter-spacing: 0.06em; }
+  .float-card .card-val { font-weight: 700; font-size: 15px; color: var(--ink); }
+  .fc-1 { top: 30px; left: -30px; animation-delay: 0s; }
+  .fc-2 { top: 60px; right: -20px; animation-delay: 1.5s; }
+  .fc-3 { bottom: 100px; right: -40px; animation-delay: 0.8s; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 100px 5vw; }
+  .section-label {
+    font-size: 11px; letter-spacing: 0.14em; color: var(--amber);
+    text-transform: uppercase; font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700; color: var(--ink);
+    line-height: 1.3; margin-bottom: 20px;
+  }
+  .section-desc {
+    font-size: 16px; color: var(--ink-soft);
+    line-height: 1.8; max-width: 600px;
+    font-weight: 300;
+  }
+
+  /* ── PAIN POINTS ── */
+  #pain { background: var(--ink); }
+  #pain .section-label { color: var(--amber-light); }
+  #pain .section-title { color: white; }
+  #pain .section-desc { color: rgba(255,255,255,0.55); }
+  .pain-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+  .pain-card {
+    background: rgba(255,255,255,0.04);
+    padding: 40px 32px;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .pain-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--amber), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .pain-card:hover { background: rgba(255,255,255,0.07); }
+  .pain-card:hover::before { opacity: 1; }
+  .pain-num {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 48px; font-weight: 700;
+    color: var(--amber-light); opacity: 0.25;
+    line-height: 1; margin-bottom: 20px;
+  }
+  .pain-title { font-size: 18px; font-weight: 500; color: white; margin-bottom: 12px; }
+  .pain-text { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.8; margin-bottom: 20px; }
+  .pain-solution {
+    font-size: 13px; color: var(--amber-light);
+    line-height: 1.7; padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* ── STRUCTURE ── */
+  #structure {
+    background: var(--warm);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+  .struct-list { margin-top: 48px; display: flex; flex-direction: column; gap: 4px; }
+  .struct-item {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 20px 24px; border-radius: 12px;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .struct-item:hover { background: rgba(255,255,255,0.7); }
+  .struct-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--amber); flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .struct-name { font-weight: 500; font-size: 15px; color: var(--ink); margin-bottom: 4px; }
+  .struct-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+
+  .table-viz {
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+  }
+  .robot-head {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: white;
+    border: 3px solid var(--amber-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 0 0 8px rgba(201,137,58,0.12);
+    margin-bottom: 16px;
+    animation: glow-ring 3s ease-in-out infinite;
+  }
+  @keyframes glow-ring {
+    0%, 100% { box-shadow: 0 0 0 8px rgba(201,137,58,0.12); }
+    50% { box-shadow: 0 0 0 16px rgba(201,137,58,0.06); }
+  }
+  .table-body {
+    width: 280px; background: white;
+    border-radius: 24px 24px 8px 8px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+  }
+  .table-screen {
+    width: 100%; aspect-ratio: 16/7;
+    background: linear-gradient(135deg, #0D1B2A 0%, #1A3A5C 100%);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px; overflow: hidden; position: relative;
+  }
+  .screen-content {
+    color: white; text-align: center; font-size: 11px;
+    letter-spacing: 0.1em; opacity: 0.7;
+  }
+  .screen-grid {
+    position: absolute; inset: 0;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 2px; padding: 8px;
+  }
+  .screen-panel {
+    border-radius: 6px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: rgba(255,255,255,0.5);
+    letter-spacing: 0.05em;
+  }
+  .light-strip {
+    height: 6px; border-radius: 100px;
+    background: linear-gradient(90deg, var(--teal-light), var(--amber), var(--rose));
+    margin-bottom: 12px;
+    animation: shift 4s linear infinite;
+    background-size: 200% 100%;
+  }
+  @keyframes shift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  .table-stand {
+    width: 30px; height: 80px;
+    background: linear-gradient(180deg, #e0d5c5 0%, #c8bba8 100%);
+    border-radius: 0 0 4px 4px;
+    margin: 0 auto;
+  }
+  .table-base {
+    width: 200px; height: 14px;
+    background: #c8bba8;
+    border-radius: 8px;
+    margin: 0 auto;
+  }
+
+  /* ── FEATURES ── */
+  #features { background: var(--cream); }
+  .feat-header {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: start;
+    margin-bottom: 72px;
+  }
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+  .feat-card {
+    background: white;
+    padding: 40px 36px;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s;
+  }
+  .feat-card:hover { transform: translateY(-4px); z-index: 2; }
+  .feat-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .feat-card:nth-child(1)::after { background: var(--amber); }
+  .feat-card:nth-child(2)::after { background: var(--teal); }
+  .feat-card:nth-child(3)::after { background: var(--purple); }
+  .feat-card:nth-child(4)::after { background: var(--rose); }
+  .feat-card:nth-child(5)::after { background: var(--teal); }
+  .feat-card:nth-child(6)::after { background: var(--amber); }
+  .feat-card:hover::after { opacity: 1; }
+  .feat-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 24px;
+  }
+  .fi-amber { background: rgba(201,137,58,0.1); }
+  .fi-teal { background: rgba(30,107,92,0.1); }
+  .fi-purple { background: rgba(75,61,122,0.1); }
+  .fi-rose { background: rgba(192,81,74,0.1); }
+  .feat-name { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 12px; }
+  .feat-text { font-size: 14px; color: var(--ink-soft); line-height: 1.8; }
+  .feat-tag {
+    display: inline-block; margin-top: 16px;
+    background: var(--warm); color: var(--amber-dark);
+    font-size: 11px; padding: 4px 12px; border-radius: 100px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── TECH ── */
+  #tech {
+    background: var(--ink);
+    padding-bottom: 120px;
+  }
+  #tech .section-label { color: var(--teal-light); }
+  #tech .section-title { color: white; }
+  .tech-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-top: 60px;
+  }
+  .tech-card {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 32px 28px;
+    background: rgba(255,255,255,0.03);
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .tech-card:hover {
+    border-color: rgba(201,137,58,0.4);
+    background: rgba(201,137,58,0.04);
+  }
+  .tech-badge {
+    display: inline-block;
+    font-size: 10px; letter-spacing: 0.12em;
+    padding: 4px 12px; border-radius: 100px;
+    margin-bottom: 20px; font-weight: 500;
+  }
+  .tb-rag { background: rgba(30,107,92,0.25); color: var(--teal-light); }
+  .tb-mm { background: rgba(75,61,122,0.25); color: #9B8DD4; }
+  .tb-hw { background: rgba(201,137,58,0.2); color: var(--amber-light); }
+  .tech-name { font-size: 17px; font-weight: 500; color: white; margin-bottom: 12px; }
+  .tech-desc { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.8; }
+  .tech-points { margin-top: 20px; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .tech-points li {
+    font-size: 12px; color: rgba(255,255,255,0.35);
+    padding-left: 16px; position: relative; line-height: 1.6;
+  }
+  .tech-points li::before {
+    content: '›'; position: absolute; left: 0;
+    color: var(--amber-light); font-weight: 700;
+  }
+
+  /* ── SCENARIOS ── */
+  #scenarios { background: var(--warm); }
+  .scene-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-top: 60px;
+  }
+  .scene-card {
+    border-radius: 20px; overflow: hidden;
+    border: 1px solid var(--border);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .scene-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(0,0,0,0.1); }
+  .scene-top {
+    height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 56px;
+  }
+  .sc-family { background: linear-gradient(135deg, #FFF0D5 0%, #FFE0B2 100%); }
+  .sc-friends { background: linear-gradient(135deg, #D5EEF0 0%, #B2DDE0 100%); }
+  .sc-kids { background: linear-gradient(135deg, #E8D5F5 0%, #D5B2F0 100%); }
+  .scene-body { background: white; padding: 24px; }
+  .scene-name { font-family: 'Noto Serif SC', serif; font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .scene-text { font-size: 13px; color: var(--ink-soft); line-height: 1.7; }
+
+  /* ── FLOW ── */
+  #flow { background: var(--cream); }
+  .flow-steps {
+    display: flex; gap: 0;
+    margin-top: 60px; position: relative;
+  }
+  .flow-steps::before {
+    content: '';
+    position: absolute;
+    top: 36px; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--amber-light), var(--amber), var(--amber-light), transparent);
+  }
+  .flow-step {
+    flex: 1; text-align: center; padding: 0 16px;
+    position: relative;
+  }
+  .step-num {
+    width: 72px; height: 72px;
+    border-radius: 50%; margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 22px; font-weight: 700;
+    position: relative; z-index: 1;
+  }
+  .sn-1 { background: var(--amber); color: white; }
+  .sn-2 { background: var(--teal); color: white; }
+  .sn-3 { background: var(--purple); color: white; }
+  .sn-4 { background: var(--rose); color: white; }
+  .sn-5 { background: var(--amber-dark); color: white; }
+  .step-title { font-weight: 500; font-size: 15px; color: var(--ink); margin-bottom: 8px; }
+  .step-text { font-size: 13px; color: var(--ink-soft); line-height: 1.7; }
+
+  /* ── CTA ── */
+  #cta {
+    background: var(--ink);
+    text-align: center;
+    padding: 120px 5vw;
+  }
+  .cta-tagline {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(20px, 3.5vw, 36px);
+    font-weight: 400; color: rgba(255,255,255,0.6);
+    line-height: 1.8; max-width: 800px;
+    margin: 0 auto 16px;
+  }
+  .cta-tagline strong {
+    color: var(--amber-light); font-weight: 700;
+  }
+  .cta-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 700; color: white;
+    margin-bottom: 48px;
+  }
+  .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn-cta-main {
+    background: var(--amber);
+    color: white; border: none;
+    padding: 18px 48px; border-radius: 100px;
+    font-size: 17px; font-family: 'Noto Sans SC', sans-serif;
+    cursor: pointer; transition: all 0.2s; font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .btn-cta-main:hover { background: var(--amber-light); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201,137,58,0.35); }
+  .btn-cta-sec {
+    background: transparent; border: 1.5px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+    padding: 18px 40px; border-radius: 100px;
+    font-size: 17px; font-family: 'Noto Sans SC', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-cta-sec:hover { border-color: var(--amber-light); color: var(--amber-light); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #0E0A04;
+    padding: 48px 5vw;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .footer-logo {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 18px; font-weight: 700; color: white;
+  }
+  .footer-logo span { color: var(--amber-light); }
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 0.06em; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 12px; color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.2s; letter-spacing: 0.06em; }
+  .footer-links a:hover { color: var(--amber-light); }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    #hero { grid-template-columns: 1fr; text-align: center; padding-top: 120px; }
+    .hero-visual { display: none; }
+    .pain-grid, .tech-grid, .scene-grid { grid-template-columns: 1fr; }
+    #structure { grid-template-columns: 1fr; }
+    .feat-header { grid-template-columns: 1fr; }
+    .feat-grid { grid-template-columns: 1fr; }
+    .flow-steps { flex-direction: column; align-items: center; gap: 32px; }
+    .flow-steps::before { display: none; }
+    .nav-links { display: none; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">贝乐<span>·</span>家剧桌</div>
+  <ul class="nav-links">
+    <li><a href="#pain">痛点</a></li>
+    <li><a href="#structure">产品</a></li>
+    <li><a href="#features">功能</a></li>
+    <li><a href="#tech">技术</a></li>
+    <li><a href="#scenarios">场景</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">了解更多</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-text">
+    <div class="hero-badge">第八届浙江省大学生智能机器人创意大赛</div>
+    <h1 class="hero-title">
+      让客厅成为<br>
+      家庭的<span class="accent">剧场</span>
+    </h1>
+    <p class="hero-subtitle">
+      AI 驱动的家庭互动剧本机器人 — 贝乐家剧桌
+    </p>
+    <p class="hero-tagline">
+      以定制剧本为内容，以磁吸交互为纽带，<br>
+      以触控大屏为载体，以音光沉浸为氛围，<br>
+      以专属记忆为沉淀。
+    </p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="location.href='beile_play.html'" style="background:var(--teal);display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">🎭</span> 立即体验游玩
+      </button>
+      <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">探索功能</button>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="product-stage">
+      <div class="product-glow"></div>
+
+      <!-- Float cards -->
+      <div class="float-card fc-1">
+        <span class="card-icon">🎭</span>
+        <div class="card-label">AI 剧本生成</div>
+        <div class="card-val">千人千剧</div>
+      </div>
+      <div class="float-card fc-2">
+        <span class="card-icon">🤖</span>
+        <div class="card-label">智能 DM 主持</div>
+        <div class="card-val">全程引导</div>
+      </div>
+      <div class="float-card fc-3">
+        <span class="card-icon">📸</span>
+        <div class="card-label">家庭记忆</div>
+        <div class="card-val">自动留存</div>
+      </div>
+
+      <!-- Product illustration -->
+      <div class="product-table">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div class="robot-head">🤖</div>
+          <div class="table-body">
+            <div class="table-screen">
+              <div class="screen-grid">
+                <div class="screen-panel">角色 A</div>
+                <div class="screen-panel">角色 B</div>
+                <div class="screen-panel">剧情线索</div>
+                <div class="screen-panel">互动指令</div>
+              </div>
+            </div>
+            <div class="light-strip"></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft);">
+              <span>130cm 高清触控屏</span>
+              <span>分屏模式</span>
+            </div>
+          </div>
+          <div class="table-stand"></div>
+          <div class="table-base"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN POINTS -->
+<section id="pain">
+  <div class="reveal">
+    <div class="section-label">市场痛点</div>
+    <div class="section-title" style="color:white">当代家庭娱乐的三大困境</div>
+    <p class="section-desc">超七成家庭缺乏有效的互动载体，代际壁垒与情感疏离正在蔓延。</p>
+  </div>
+  <div class="pain-grid reveal">
+    <div class="pain-card">
+      <div class="pain-num">01</div>
+      <div class="pain-title">娱乐模式单一</div>
+      <div class="pain-text">超七成家庭以单人刷手机、看电视为主，传统娱乐存在代际壁垒，缺乏全年龄段通用互动载体。</div>
+      <div class="pain-solution">→ 创新"家具化 + 智能化"融合形态，桌型载体覆盖全年龄段</div>
+    </div>
+    <div class="pain-card">
+      <div class="pain-num">02</div>
+      <div class="pain-title">互动碎片化</div>
+      <div class="pain-text">城市家庭日均共同互动时长低，"在场不陪伴"现象普遍，客厅社交功能弱化，情感疏离。</div>
+      <div class="pain-solution">→ 以剧本演绎激活双向交流，重构客厅情感交流核心场景</div>
+    </div>
+    <div class="pain-card">
+      <div class="pain-num">03</div>
+      <div class="pain-title">产品供给错位</div>
+      <div class="pain-text">传统产品门槛高，智能产品多为单人模式，家庭剧本娱乐因创作难、无引导难以普及。</div>
+      <div class="pain-solution">→ AI 驱动个性化剧本生成 + 磁吸智能 DM，实现零门槛常态化娱乐</div>
+    </div>
+  </div>
+</section>
+
+<!-- STRUCTURE -->
+<section id="structure">
+  <div class="reveal">
+    <div class="section-label">产品结构</div>
+    <div class="section-title">精工设计<br>每个细节都有理由</div>
+    <p class="section-desc">从 130cm 高清触控大屏到静音万向轮，贝乐家剧桌将工业设计与家庭美学融为一体。</p>
+    <div class="struct-list">
+      <div class="struct-item">
+        <div class="struct-dot"></div>
+        <div>
+          <div class="struct-name">双模式触控主屏</div>
+          <div class="struct-desc">130cm 高清屏，支持全屏 / 分屏一键切换，适配单人沉浸与多人协作。</div>
+        </div>
+      </div>
+      <div class="struct-item">
+        <div class="struct-dot" style="background:var(--teal)"></div>
+        <div>
+          <div class="struct-name">磁吸式智能 DM 机器人</div>
+          <div class="struct-desc">集成双目视觉与多模态交互算法，精准识别现场情绪并演绎角色。磁吸快拆，即插即用。</div>
+        </div>
+      </div>
+      <div class="struct-item">
+        <div class="struct-dot" style="background:var(--purple)"></div>
+        <div>
+          <div class="struct-name">液压柱升降系统</div>
+          <div class="struct-desc">桌面高度 60–90cm 灵活调节，内置精密缓冲装置，升降平稳无噪音。</div>
+        </div>
+      </div>
+      <div class="struct-item">
+        <div class="struct-dot" style="background:var(--rose)"></div>
+        <div>
+          <div class="struct-name">环绕立体音响系统</div>
+          <div class="struct-desc">双声道 + 独立低音炮，智能音频算法根据剧情自动调节音效，360° 全景声场。</div>
+        </div>
+      </div>
+      <div class="struct-item">
+        <div class="struct-dot" style="background:var(--amber-dark)"></div>
+        <div>
+          <div class="struct-name">静音万向轮移动系统</div>
+          <div class="struct-desc">高耐磨聚氨酯材质，踩踏式刹车锁定，移动灵活，固定可靠，完全不影响家庭休息。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-viz reveal" style="justify-content:center">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:11px;letter-spacing:0.1em;color:var(--ink-soft);margin-bottom:8px">BEILE DM</div>
+        <div class="robot-head" style="margin:0 auto;">🤖</div>
+      </div>
+      <div class="table-body" style="width:320px">
+        <div class="table-screen">
+          <div class="screen-grid">
+            <div class="screen-panel">玩家 A 剧本</div>
+            <div class="screen-panel">玩家 B 剧本</div>
+            <div class="screen-panel" style="font-size:8px">当前线索 · 第二幕</div>
+            <div class="screen-panel" style="font-size:8px">互动指令面板</div>
+          </div>
+        </div>
+        <div class="light-strip"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--ink-soft)">
+          <div style="background:var(--warm);border-radius:8px;padding:8px 12px">
+            <div style="font-weight:500;color:var(--ink);margin-bottom:2px">高清触控屏</div>
+            <div>130cm · 4K</div>
+          </div>
+          <div style="background:var(--warm);border-radius:8px;padding:8px 12px">
+            <div style="font-weight:500;color:var(--ink);margin-bottom:2px">磁吸机器人</div>
+            <div>多模态感知</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin:8px 0;font-size:11px;color:var(--ink-soft)">
+        <span>↕ 60–90cm 液压升降</span>
+      </div>
+      <div class="table-stand"></div>
+      <div class="table-base"></div>
+      <div style="margin-top:16px;display:flex;gap:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--teal-light);opacity:0.7;animation:pulse 2s infinite"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--amber);opacity:0.7;animation:pulse 2s 0.6s infinite"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--rose);opacity:0.7;animation:pulse 2s 1.2s infinite"></div>
+      </div>
+      <div style="font-size:11px;color:var(--ink-soft);margin-top:8px;letter-spacing:0.06em">环绕柔光呼吸带</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="feat-header reveal">
+    <div>
+      <div class="section-label">核心功能</div>
+      <div class="section-title">五大创新<br>重构智能家庭场景</div>
+    </div>
+    <p class="section-desc" style="padding-top:16px">
+      模块化 · 全场景 · 沉浸式 · 自适应 · 一体化<br><br>
+      贝乐家剧桌打造了从剧本生成到记忆留存的全流程闭环服务，让每一次家庭互动都成为可留存的温暖回忆。
+    </p>
+  </div>
+  <div class="feat-grid reveal">
+    <div class="feat-card">
+      <div class="feat-icon fi-amber">🎭</div>
+      <div class="feat-name">生成式 AI 剧本定制系统</div>
+      <div class="feat-text">内置家庭场景专属多模态剧本创作大模型，搭载家庭需求智能识别算法，生成专属个性化剧本，适配全龄家庭场景。实现"千人千剧"。</div>
+      <span class="feat-tag">AI 驱动</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-teal">🤖</div>
+      <div class="feat-name">多身份智能 DM 全流程交互</div>
+      <div class="feat-text">磁吸式智能机器人全程参与剧本演绎，从开场到收尾零人工干预。无需专业 DM，在家随想随玩，省时省力更经济。</div>
+      <span class="feat-tag">全流程引导</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-purple">💡</div>
+      <div class="feat-name">多模态沉浸式氛围联动</div>
+      <div class="feat-text">柔光漫反射呼吸灯带根据剧情实时动态调节颜色与频率，音光同步，无需看屏即可感知剧情节奏与互动信号。</div>
+      <span class="feat-tag">音光联动</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-rose">🗣️</div>
+      <div class="feat-name">自然语言双轨交互体系</div>
+      <div class="feat-text">支持自定义唤醒词，系统搭载语音情绪识别算法，实时识别家庭成员语音情绪，动态调整互动语气，让交互更有温度。</div>
+      <span class="feat-tag">情感计算</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-teal">📸</div>
+      <div class="feat-name">家庭记忆 AI 相册系统</div>
+      <div class="feat-text">AI 记忆系统自动捕捉互动高光时刻，生成专属影像，沉淀家庭专属情感回忆，让每次游戏都成为珍贵的家庭故事。</div>
+      <span class="feat-tag">记忆留存</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-amber">👨‍👩‍👧‍👦</div>
+      <div class="feat-name">全龄段无门槛适配设计</div>
+      <div class="feat-text">桌面触控屏支持剧本缩放、角色选择、流程切换；多人分屏模式每位参与者独立界面，隐私与互动兼顾，适配全家参与。</div>
+      <span class="feat-tag">零门槛体验</span>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section id="tech">
+  <div class="reveal">
+    <div class="section-label">技术支持</div>
+    <div class="section-title" style="color:white">双核心智能架构</div>
+    <p class="section-desc" style="max-width:520px;color:rgba(255,255,255,0.45)">
+      RAG + LLM 动态剧情引擎与多模态感知系统协同驱动，实现专业级家庭娱乐体验。
+    </p>
+  </div>
+  <div class="tech-grid reveal">
+    <div class="tech-card">
+      <span class="tech-badge tb-rag">RAG + LLM</span>
+      <div class="tech-name">动态剧情构建引擎</div>
+      <div class="tech-desc">大语言模型（DeepSeek 等）作为推理大脑，结合向量数据库调取专业剧本库素材。</div>
+      <ul class="tech-points">
+        <li>LLM 语义创作，逻辑连贯剧本生成与即兴演义</li>
+        <li>RAG 检索增强，消除 AI 幻觉，保证专业度</li>
+        <li>动态逻辑流，根据玩家实时决策分支走向</li>
+      </ul>
+    </div>
+    <div class="tech-card">
+      <span class="tech-badge tb-mm">多模态感知</span>
+      <div class="tech-name">多模态感知与控制</div>
+      <div class="tech-desc">ASR 语音识别 + NLP 自然语言处理，精准捕捉玩家意图并转化为剧本指令。</div>
+      <ul class="tech-points">
+        <li>语音语义对齐，精准捕捉玩家意图</li>
+        <li>情感计算反馈，实时分析语调与表情</li>
+        <li>动态调整氛围灯光效果与背景音频节奏</li>
+      </ul>
+    </div>
+    <div class="tech-card">
+      <span class="tech-badge tb-hw">高并发架构</span>
+      <div class="tech-name">实时交互硬件架构</div>
+      <div class="tech-desc">桌面主板集成 NPU 神经网络处理单元，本地化手势识别与多点触控零延迟响应。</div>
+      <ul class="tech-points">
+        <li>边缘计算，NPU 本地运行视觉识别</li>
+        <li>分布式渲染，支持每个玩家席位独立视角</li>
+        <li>120cm 4K 分区域渲染，互不干扰</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SCENARIOS -->
+<section id="scenarios">
+  <div class="reveal" style="text-align:center;max-width:600px;margin:0 auto">
+    <div class="section-label">适用场景</div>
+    <div class="section-title">随时随地<br>家庭的专属剧场</div>
+    <p class="section-desc" style="margin:0 auto">从亲子日常到亲友聚会，贝乐家剧桌让每种家庭时刻都充满故事。</p>
+  </div>
+  <div class="scene-grid reveal">
+    <div class="scene-card">
+      <div class="scene-top sc-family">🏠</div>
+      <div class="scene-body">
+        <div class="scene-name">亲子日常陪伴</div>
+        <div class="scene-text">家长与孩子共同扮演角色，AI 根据孩子年龄自动调整剧情难度，让亲子时光充满创意与温情。</div>
+      </div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-top sc-friends">🎊</div>
+      <div class="scene-body">
+        <div class="scene-name">亲友聚会娱乐</div>
+        <div class="scene-text">多人分屏模式适配 2–8 人参与，AI 实时生成专属剧本，派对氛围即刻升温，无需提前准备。</div>
+      </div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-top sc-kids">✨</div>
+      <div class="scene-body">
+        <div class="scene-name">全家合家欢</div>
+        <div class="scene-text">跨代际内容适配，祖父母到孙辈都能无障碍参与，打破年龄壁垒，重构客厅情感核心场景。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section id="flow" style="background:white">
+  <div class="reveal" style="text-align:center;max-width:560px;margin:0 auto 0">
+    <div class="section-label">使用流程</div>
+    <div class="section-title">五步开启<br>你们的专属冒险</div>
+  </div>
+  <div class="flow-steps reveal">
+    <div class="flow-step">
+      <div class="step-num sn-1">1</div>
+      <div class="step-title">AI 剧本生成</div>
+      <div class="step-text">输入人数与喜好，AI 即时创作专属剧本，角色分配自动完成。</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num sn-2">2</div>
+      <div class="step-title">角色认领</div>
+      <div class="step-text">触控屏各自选择角色，分屏模式保护剧情隐私，独立视角体验。</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num sn-3">3</div>
+      <div class="step-title">DM 开场引导</div>
+      <div class="step-text">智能机器人宣布开场，全程主持引导，光音联动营造沉浸氛围。</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num sn-4">4</div>
+      <div class="step-title">互动演绎</div>
+      <div class="step-text">语音指令 + 触控操作，AI 根据决策实时分支剧情，精彩不可预测。</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num sn-5">5</div>
+      <div class="step-title">记忆留存</div>
+      <div class="step-text">AI 自动捕捉高光时刻，生成专属家庭影像，沉淀属于你们的故事。</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="reveal">
+    <p class="cta-tagline">
+      "<strong>贝乐家剧桌</strong>，让每一次家庭互动<br>都成为可留存的温暖回忆。"
+    </p>
+    <h2 class="cta-title">把客厅变成你们的剧场</h2>
+    <div class="cta-buttons">
+      <button class="btn-cta-main" onclick="location.href='beile_play.html'">🎭 立即体验游玩</button>
+      <button class="btn-cta-sec" onclick="document.getElementById('structure').scrollIntoView({behavior:'smooth'})">了解产品</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">贝乐<span>家剧桌</span></div>
+  <div class="footer-copy">© 2025 BeiLe Interactive · 浙江省大学生智能机器人创意大赛参赛作品</div>
+  <div class="footer-links">
+    <a href="#pain">市场痛点</a>
+    <a href="#structure">产品结构</a>
+    <a href="#features">核心功能</a>
+    <a href="#tech">技术架构</a>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, 80);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
